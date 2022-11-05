@@ -9,7 +9,7 @@ jobs:
         run: |
           expr 2 + 3 > add-math-homework.txt
       - name: Upload math result for job_one
-        uses: actions/upload-artifacts@v3
+        uses: actions/upload-artifact@v3
         with:
           name: add-homework
           path: add-math-homework.txt
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download math result from artifacts
-        uses: actions/download-artifacts@v3
+        uses: actions/download-artifact@v3
         with:
           name: add-homework
       - shell: bash
@@ -27,7 +27,7 @@ jobs:
           value=$(cat add-math-homework.txt)
           expr $value \* 100 > multiply-math-homework.txt
       - name: Upload math result for job_two
-        uses: actions/upload-artifacts@v3
+        uses: actions/upload-artifact@v3
         with:
           name: mult-homework
           path: multiply-math-homework.txt
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts from job2
-        uses: actions/download-artifacts@v3
+        uses: actions/download-artifact@v3
         with:
           name: mult-homework
       - name: Print result
