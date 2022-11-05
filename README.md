@@ -1,2 +1,2 @@
 # softcomweb-gihub-actions
-Learning github actions
+Learning github actions and workflows
