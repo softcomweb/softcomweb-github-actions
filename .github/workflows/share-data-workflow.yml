@@ -1,0 +1,47 @@
+on: [push]
+
+jobs:
+  job_one:
+    name: Add 2 and 3
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        run: |
+          expr 2 + 3 > add-math-homework.txt
+      - name: Upload math result for job_one
+        uses: actions/upload-artifacts@v3
+        with:
+          name: add-homework
+          path: add-math-homework.txt
+  job_two:
+    name: multiply by 100
+    needs: job_one
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download math result from artifacts
+        uses: actions/download-artifacts@v3
+        with:
+          name: add-homework
+      - shell: bash
+        run: |
+          value=$(cat add-math-homework.txt)
+          expr $value \* 100 > multiply-math-homework.txt
+      - name: Upload math result for job_two
+        uses: actions/upload-artifacts
+        with:
+          name: mult-homework
+          path: multiply-math-homework.txt
+  job_three:
+    name: Display Results
+    needs: job_two
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts from job2
+        uses: actions/download-artifacts
+        with:
+          name: mult-homework
+      - name: Print result
+        shell: bash
+        run: |
+          value=$(cat multiply-math-homework.txt)
+          echo $value
