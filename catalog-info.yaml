@@ -2,7 +2,24 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: "softcomweb-gihub-actions"
+  description: A sample project for learning and testing Github Actions
+  labels:
+    softcomweb.info/managed-by: leacoco
+    softcomweb.info/org: softcomweb
+    softcomweb.info/team: devops
+    softcomweb.info/service: github-actions
+    softcomweb.info/environment: live
+  annotations:
+    softcomweb.info/service-discovery: github-actions
+  tags:
+    - github-actions
+  links:
+    - url: https://admin.softcomweb.info
+      title: Admin Dashboard
+      icon: dashboard
+      type: admin-dashboard
 spec:
   type: service
-  owner: user:leacoco
+  owner: devops
   lifecycle: experimental
+  system: github-actions
