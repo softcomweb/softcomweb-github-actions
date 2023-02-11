@@ -40,7 +40,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: mult-homework
-      - name: Print result
+      - name: Print result from job_one multiply by 10 by job_two
         shell: bash
         run: |
           value=$(cat multiply-math-homework.txt)
