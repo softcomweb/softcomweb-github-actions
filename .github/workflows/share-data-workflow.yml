@@ -1,6 +1,21 @@
 on: [push]
-
+permissions:
+  id-token: write
 jobs:
+  AWSCredentials:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: eu-central-1
+          role-to-assume: arn:aws:iam::250946034964:role/github-actions-oidc-role
+      - name: Print AWS SSM Parameters
+        run: aws ssm describe-parameters
+      - name: Print awsume role
+        run: aws sts get-caller-identity
+      - name: List cloudformation stacks
+        run: aws cloudformation list-stacks
   job_one:
     name: Add 2 and 3
     runs-on: ubuntu-latest
