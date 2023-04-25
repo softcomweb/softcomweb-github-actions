@@ -7,9 +7,13 @@ inputs:
   environment:
     description: AWS environment to configure
     required: true
-  rolename:
+  roleName:
     description: AWS role name
     required: true
+  awsRegion:
+    description: AWS Region name
+    required: false
+    default: eu-central-1
 
 runs:
   using: "composite"
@@ -31,8 +35,8 @@ runs:
     
     - name: setup env AWS_REGION
       shell: bash
-      run: echo "AWS_REGION=eu-central-1" >> $GITHUB_ENV
+      run: echo "AWS_REGION=${{ inputs.awsRegion }}" >> $GITHUB_ENV
 
     - name: setup env assume role
       shell: bash
-      run: echo "AWS_ASSUME_ROLE_NAME=${{ inputs.rolename }}" >> $GITHUB_ENV
+      run: echo "AWS_ASSUME_ROLE_NAME=${{ inputs.roleName }}" >> $GITHUB_ENV

@@ -16,7 +16,8 @@ jobs:
         uses: softcomweb/softcomweb-github-actions/setup-aws@main
         with:
           environment: infra
-          rolename: github-actions-oidc-role
+          roleName: github-actions-oidc-role
+          awsRegion: eu-central-1
 
       - name: Configure aws credentials
         id: configure-aws-credentials
@@ -35,6 +36,16 @@ jobs:
       - name: List cloudformation stacks
         run: aws cloudformation list-stacks
 
+  DeployCdk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Deploy cdk
+        uses: softcomweb/softcomweb-github-actions/cdk-deploy@main
+        with:
+          environment: infra
+          cdk_path: cdk
 
   # job_one:
   #   name: Add 2 and 3

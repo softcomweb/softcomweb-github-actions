@@ -1,0 +1,79 @@
+---
+
+name: "CDK Deplyoment"
+description: "Deploy CDK stack"
+
+inputs:
+  # aws_account_id:
+  #   description: "AWS account id"
+  #   required: true
+  # aws_region:
+  #   description: "AWS region"
+  #   required: true  
+  # aws_role_name:
+  #   description: "AWS Role to assume"
+  #   required: true
+  environment:
+    description: "App Environment"
+    required: true
+  cdk_path:
+    description: "Path to cdk"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Extract branch name
+      id: extract_branch
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+
+    - name: Setup AWS
+      uses: softcomweb/softcomweb-github-actions/setup-aws
+      with:
+        environment: ${{ inputs.environment }}
+        rolename: github-actions-oidc-role
+
+    - id: configure-aws-credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_ASSUME_ROLE_NAME }}
+        role-session-name: codebuilddeploysession
+        aws-region: ${{ env.AWS_REGION }}
+
+    - id: login-ecr-public
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        registry-type: public
+      env:
+        AWS_DEFAULT_REGION: us-east-1
+        AWS_REGION: us-east-1
+
+    - id: deployment
+      shell: bash
+      env:
+        AWS_ACCOUNT_ID: ${{ env.AWS_ACCOUNT_ID }}
+        AWS_REGION: ${{ env.AWS_REGION }}
+        ENVIRONMENT: ${{ inputs.environment }}
+        BRANCH: ${{ steps.extract_branch.outputs.branch }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+        COMMIT_AUTHOR: ${{ github.event.pusher.name }}
+      working-directory: ${{ inputs.cdk_path }}
+      run: echo "Deploying cdk to env ${{ inputs.environment }}" 
+      # run: |
+      #   npm run cdk:deploy -- \
+      #     --ci \
+      #     --execute \
+      #     --verbose \
+      #     --progress events \
+      #     --context @softcomweb:core:awsAccount=${AWS_ACCOUNT_ID} \
+      #     --context @softcomweb:core:awsRegion=${AWS_REGION} \
+      #     --context @softcomweb:core:appEnvironment=${ENVIRONMENT} \
+      #     --tags environment=${ENVIRONMENT:-unknown} \
+      #     --tags git.softcomweb/repository-url=${GITHUB_REPOSITORY_URL:-unknown} \
+      #     --tags git.softcomweb/branch=${BRANCH:-unknown} \
+      #     --tags release.softcomweb/initiator=${COMMIT_AUTHOR:-unknown} \
+      #     --tags team=ops \
+      #     --tags vertical=ops \
+      #     "${CDK_STACKS:-*}"
