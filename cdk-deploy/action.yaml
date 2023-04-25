@@ -29,7 +29,7 @@ runs:
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
 
     - name: Setup AWS
-      uses: softcomweb/softcomweb-github-actions/setup-aws
+      uses: softcomweb/softcomweb-github-actions/setup-aws@main
       with:
         environment: ${{ inputs.environment }}
         rolename: github-actions-oidc-role
