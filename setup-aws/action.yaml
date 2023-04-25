@@ -35,4 +35,4 @@ runs:
 
     - name: setup env assume role
       shell: bash
-      run: echo "AWS_ASSUME_ROLE_NAME=${{ input.rolename }}" >> $GITHUB_ENV
+      run: echo "AWS_ASSUME_ROLE_NAME=${{ inputs.rolename }}" >> $GITHUB_ENV
