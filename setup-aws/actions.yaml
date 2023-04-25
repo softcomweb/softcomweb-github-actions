@@ -1,0 +1,35 @@
+name: setup aws environment
+
+inputs:
+  environment:
+    description: AWS environment to configure
+    required: true
+  rolename:
+    description: AWS role name
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: setup env AWS_ACCOUNT_ID nonlive
+      shell: bash
+      if: ${{ inputs.environment == "nonlive" }}
+      run: echo "AWS_ACCOUNT_ID=359150914216" >> $GITHUB_ENV
+
+    - name: setup env AWS_ACCOUNT_ID live
+      shell: bash
+      if: ${{ inputs.environment == "live" }}
+      run: echo "AWS_ACCOUNT_ID=593454847828" >> $GITHUB_ENV
+
+    - name: setup env AWS_ACCOUNT_ID infra
+      shell: bash
+      if: ${{ inputs.environment == "infra" }}
+      run: echo "AWS_ACCOUNT_ID=250946034964" >> $GITHUB_ENV
+    
+    - name: setup env AWS_REGION
+      shell: bash
+      run: echo "AWS_REGION=eu-central-1" >> $GITHUB_ENV
+
+    - name: setup env assume role
+      shell: bash
+      run: echo "AWS_ASSUME_ROLE_NAME=${{ input.rolename }}" >> $GITHUB_ENV

@@ -1,62 +1,82 @@
+---
+
 on: [push]
+
 permissions:
   id-token: write
+  contents: write
+
 jobs:
   AWSCredentials:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      
+      - name: setup env for infrastructure
+        uses: softcomweb/softcomweb-github-actions/setup-aws@main
+        with:
+          environment: infra
+          rolename: github-actions-oidc-role
+
       - name: Configure aws credentials
+        id: configure-aws-credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: eu-central-1
-          role-to-assume: arn:aws:iam::250946034964:role/github-actions-oidc-role
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.AWS_ASSUME_ROLE_NAME}}
+          role-session-name: githubactionawssession
+
       - name: Print AWS SSM Parameters
         run: aws ssm describe-parameters
+
       - name: Print awsume role
         run: aws sts get-caller-identity
+
       - name: List cloudformation stacks
         run: aws cloudformation list-stacks
-  job_one:
-    name: Add 2 and 3
-    runs-on: ubuntu-latest
-    steps:
-      - shell: bash
-        run: |
-          expr 2 + 3 > add-math-homework.txt
-      - name: Upload math result for job_one
-        uses: actions/upload-artifact@v3
-        with:
-          name: add-homework
-          path: add-math-homework.txt
-  job_two:
-    name: multiply by 100
-    needs: job_one
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download math result from artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: add-homework
-      - shell: bash
-        run: |
-          value=$(cat add-math-homework.txt)
-          expr $value \* 100 > multiply-math-homework.txt
-      - name: Upload math result for job_two
-        uses: actions/upload-artifact@v3
-        with:
-          name: mult-homework
-          path: multiply-math-homework.txt
-  job_three:
-    name: Display Results
-    needs: job_two
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifacts from job2
-        uses: actions/download-artifact@v3
-        with:
-          name: mult-homework
-      - name: Print result from job_one multiply by 10 by job_two
-        shell: bash
-        run: |
-          value=$(cat multiply-math-homework.txt)
-          echo $value
+
+
+  # job_one:
+  #   name: Add 2 and 3
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - shell: bash
+  #       run: |
+  #         expr 2 + 3 > add-math-homework.txt
+  #     - name: Upload math result for job_one
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: add-homework
+  #         path: add-math-homework.txt
+  # job_two:
+  #   name: multiply by 100
+  #   needs: job_one
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download math result from artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: add-homework
+  #     - shell: bash
+  #       run: |
+  #         value=$(cat add-math-homework.txt)
+  #         expr $value \* 100 > multiply-math-homework.txt
+  #     - name: Upload math result for job_two
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: mult-homework
+  #         path: multiply-math-homework.txt
+  # job_three:
+  #   name: Display Results
+  #   needs: job_two
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download artifacts from job2
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: mult-homework
+  #     - name: Print result from job_one multiply by 10 by job_two
+  #       shell: bash
+  #       run: |
+  #         value=$(cat multiply-math-homework.txt)
+  #         echo $value
